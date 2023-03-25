@@ -2,13 +2,12 @@ import os
 import openai
 import maya.cmds as cmds
 
-
 class OpenAi:
     def __init__(self):
         self.window_name = 'GPT Script Generator'
         # Your specific API key, do not share. Keep this private.
         openai.api_key = "YOUR API KEY HERE"
-
+        
         # Load config values
         self.load_config()
 
@@ -20,7 +19,6 @@ class OpenAi:
         self.temp = 0.5
 
     def return_openai(self):
-
         prompt = cmds.textField(self.promptField, query=True, text=True)
         completions = openai.Completion.create(
             engine=self.engine,
@@ -46,25 +44,20 @@ class OpenAi:
         cmds.window(title="Python Code Generated", widthHeight=(600, 400))
         cmds.columnLayout(adjustableColumn=True)
         cmds.text(label="Generated Python code:", align="left", font="boldLabelFont")
-
         cmds.scrollField(wordWrap=True, text=response, width=580, height=350, backgroundColor=(0.2, 0.2, 0.2),
                          editable=False)
         cmds.button(label='Save Script',
                     bgc=(1.0, 0.5, 0.0),
                     command=self.save_script)
-
         cmds.showWindow()
 
     def save_script(self, *args):
         response = self.return_openai()
-
         scripts_path = os.getenv("MAYA_SCRIPT_PATH").split(";")[0]
         if not os.path.exists(scripts_path):
             os.mkdir(scripts_path)
-
         with open("{}/maya_ai_saved_script.py".format(scripts_path), "w") as f:
             f.write(response)
-
         os.startfile(scripts_path)
 
     def main_ui(self):
